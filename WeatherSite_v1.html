@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Päivän sää</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+    <script>
+
+
+
+    function drawGraphics(time, temperature, humidity)
+    {
+
+      //LÄMPÖTILA & KOSTEUS GRAFIIKKA
+      var ctx = document.getElementById('tempChart').getContext('2d');
+
+
+      var chart = new Chart(ctx, {
+      // The type of chart we want to create
+      type: 'line',
+
+
+      data: {
+                labels: time,
+                datasets: [{
+                    label: 'Temperature',
+                    //backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: temperature,
+                },
+                //tässä data set kosteudelle hakasulkuun asti
+                  {
+                  label: 'Humidity',
+                  //backgroundColor: 'rgb(255, 255, 255)',
+                  borderColor: 'rgb(0, 0, 255)',
+                  data: humidity,
+                  }]
+            },
+
+
+
+      // Configuration options go here
+      options:
+      {
+      }
+      });
+    }
+
+
+
+
+
+    function start()
+    {
+
+      let date = document.querySelector("#dateId");
+
+
+      let myDate =  new Date();
+      date.value = myDate.toISOString().slice(0,10);
+  //    date.value = myDate.getFullYear() +'-'+myDate.getMonth()+'-'+myDate.getUTCDate();
+
+      getWeather();
+/*
+      window.setInterval(function(){
+        const d = new Date();
+        let target = document.querySelector("#timeTarget");
+        resetTime = d.getSeconds();
+        target.innerHTML = resetTime //d.getSeconds();
+      }, 1000);*/
+
+    }
+
+
+
+
+
+
+    function getWeather()
+    {
+
+      //arraySize = timeFromDB.length;
+
+
+      let date = document.querySelector("#dateId");
+      console.log(date.value);
+/*
+
+*/
+      //axios.get('http://ec2-3-88-203-40.compute-1.amazonaws.com/Wdata') //tämä toimii vielä
+      axios.get('http://ec2-3-88-203-40.compute-1.amazonaws.com/Wdata/day/'+date.value)// day/+date.value) // päivämäärä muodossa YYYY-MM-DD
+      .then(function (response) {
+        // handle success
+        console.log(response);
+
+        let time = [];
+        let temperature = [];
+        let humidity = [];
+
+
+        response.data.forEach(element =>{
+          time.push(element.time.slice(0,8));
+          temperature.push(element.temperature);
+          humidity.push(element.humidity);
+        })
+
+
+        drawGraphics(time, temperature, humidity);
+
+
+
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+
+
+    }
+
+    </script>
+  </head>
+  <body onload="start()">
+    <!--  Time is
+  <div id="timeTarget"></div>-->
+    <div>
+      <p>
+
+
+        <table border="1" height = "500" width = "1000">
+          <tr>
+
+            <!-- GRAAFI KANVAS -->
+              <th><canvas id="tempChart" width="1000" height="500"></th>
+
+
+            </tr>
+
+            <!-- NAPPI -->
+            <th>      </p>
+                  <button onclick="getWeather()">Get the data</button>
+                  <input type="date" name="date" id = "dateId">
+                  <div id="clickTarget"></div></th>
+            <tr
+          Click on the button to get data from api at https://jsonplaceholder.typicode.com/posts
+
+    </div>
+
+    <script>
+
+
+
+    </script>
+  </body>
+</html>
